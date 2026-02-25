@@ -69,7 +69,7 @@ Il suffit de passer l'URL directement en argument, peu importe sa position. Le s
  / / __/ __ \/ / / / / / __ `/ __ `/ _ \/ ___/
 / /_/ / /_/ / / /_/ / / /_/ / /_/ /  __/ /    
 \____/\____/_/_____/_/\__, /\__, /\___/_/     
-                     /____//____/             v2.3.0
+                     /____//____/             v2.3.1
  
 [INF] Scanning https://ygp4ph.me (Depth: 3)
 [INT] https://ygp4ph.me/assets/pdp_anime.mp4
