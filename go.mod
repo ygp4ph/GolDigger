@@ -1,4 +1,4 @@
-module github.com/ygp4ph/GolDigger/v2
+module github.com/ygp4ph/goldigger/v2
 
 go 1.25.5
 

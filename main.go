@@ -47,7 +47,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\nUSAGE: %s [flags] <url>\n\nFLAGS:\n  -d, --depth\tMax recursion (default 3)\n  -e, --ext\tInclude external links\n  -t, --tree\tShow internal links tree\n  -o, --output\tOutput file (JSON)\n  -v, --verbose\tShow errors\n  --version\tShow version\n  -h, --help\tShow help\n", os.Args[0])
 	}
 
-	// Separate flags and the positional URL argument so user can type `GolDigger url -t`
+	// Separate flags and the positional URL argument so user can type `goldigger url -t`
 	var args []string
 	for _, arg := range os.Args[1:] {
 		if !strings.HasPrefix(arg, "-") && c.TargetURL == "" {
@@ -64,7 +64,7 @@ func main() {
 		return
 	}
 	if version {
-		fmt.Printf("GolDigger %s\n", Version)
+		fmt.Printf("goldigger %s\n", Version)
 		return
 	}
 

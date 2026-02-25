@@ -7,7 +7,7 @@ Un crawler web rapide et efficace écrit en Go pour la découverte automatique d
 ### Installation rapide
 
 ```bash
-go install github.com/ygp4ph/GolDigger/v2@latest
+go install github.com/ygp4ph/goldigger/v2@latest
 ```
 
 ### Mise à jour
@@ -15,7 +15,7 @@ go install github.com/ygp4ph/GolDigger/v2@latest
 Pour mettre à jour l'outil vers la dernière version, relancez simplement la commande d'installation :
 
 ```bash
-go install github.com/ygp4ph/GolDigger/v2@latest
+go install github.com/ygp4ph/goldigger/v2@latest
 ```
 
 ### Compilation depuis les sources
@@ -35,9 +35,9 @@ go install
 Il suffit de passer l'URL directement en argument, peu importe sa position. Le scanner ajoutera automatiquement le préfixe `https://` si manquant pour une exécution éclair.
 
 ```bash
-./GolDigger <URL> [options]
+./goldigger <URL> [options]
 # ou
-./GolDigger [options] <URL>
+./goldigger [options] <URL>
 ```
 
 ### Protocoles couverts automatiquement
@@ -62,7 +62,7 @@ Il suffit de passer l'URL directement en argument, peu importe sa position. Le s
 ### Exemple
 
 ```text
-~/CTF/HTB/en_cours $ GolDigger ygp4ph.me
+~/CTF/HTB/en_cours $ goldigger ygp4ph.me
 
    ______      ______  _                      
   / ____/___  / / __ \(_)___ _____ ____  _____
