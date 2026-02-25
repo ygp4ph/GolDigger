@@ -33,12 +33,12 @@ func main() {
 
 	banner := func() {
 		color.Cyan(`
-    ______      __    ______  _                      
-  / ____/___  / /___/ / __ \(_)___ _____ ____  _____
- / / __/ __ \/ / __  / / / / / __ `+"`"+`/ __ `+"`"+`/ _ \/ ___/
-/ /_/ / /_/ / / /_/ / /_/ / / /_/ / /_/ /  __/ /    
-\____/\____/_/\__,_/_____/_/\__, /\__, /\___/_/     
-                           /____//____/             %s
+   ______      ______  _                      
+  / ____/___  / / __ \(_)___ _____ ____  _____
+ / / __/ __ \/ / / / / / __ `+"`"+`/ __ `+"`"+`/ _ \/ ___/
+/ /_/ / /_/ / / /_/ / / /_/ / /_/ /  __/ /    
+\____/\____/_/_____/_/\__, /\__, /\___/_/     
+                     /____//____/             %s
 `, Version)
 	}
 
@@ -47,7 +47,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\nUSAGE: %s [flags] <url>\n\nFLAGS:\n  -d, --depth\tMax recursion (default 3)\n  -e, --ext\tInclude external links\n  -t, --tree\tShow internal links tree\n  -o, --output\tOutput file (JSON)\n  -v, --verbose\tShow errors\n  --version\tShow version\n  -h, --help\tShow help\n", os.Args[0])
 	}
 
-	// Separate flags and the positional URL argument so user can type `yg-scovery url -t`
+	// Separate flags and the positional URL argument so user can type `GolDigger url -t`
 	var args []string
 	for _, arg := range os.Args[1:] {
 		if !strings.HasPrefix(arg, "-") && c.TargetURL == "" {
@@ -64,7 +64,7 @@ func main() {
 		return
 	}
 	if version {
-		fmt.Printf("yg-scovery %s\n", Version)
+		fmt.Printf("GolDigger %s\n", Version)
 		return
 	}
 

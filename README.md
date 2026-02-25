@@ -1,4 +1,4 @@
-# Yg-Scovery
+# GolDigger
 
 Un crawler web rapide et efficace écrit en Go pour la découverte automatique de liens et l'exploration de sites web, avec support automatique du parsing des `robots.txt` et `sitemap.xml`.
 
@@ -7,7 +7,7 @@ Un crawler web rapide et efficace écrit en Go pour la découverte automatique d
 ### Installation rapide
 
 ```bash
-go install github.com/ygp4ph/yg-scovery/v2@latest
+go install github.com/ygp4ph/GolDigger/v2@latest
 ```
 
 ### Mise à jour
@@ -15,15 +15,15 @@ go install github.com/ygp4ph/yg-scovery/v2@latest
 Pour mettre à jour l'outil vers la dernière version, relancez simplement la commande d'installation :
 
 ```bash
-go install github.com/ygp4ph/yg-scovery/v2@latest
+go install github.com/ygp4ph/GolDigger/v2@latest
 ```
 
 ### Compilation depuis les sources
 
 ```bash
 # Cloner le repository
-git clone https://github.com/ygp4ph/yg-scovery.git
-cd yg-scovery
+git clone https://github.com/ygp4ph/GolDigger.git
+cd GolDigger
 
 go install
 ```
@@ -35,9 +35,9 @@ go install
 Il suffit de passer l'URL directement en argument, peu importe sa position. Le scanner ajoutera automatiquement le préfixe `https://` si manquant pour une exécution éclair.
 
 ```bash
-./yg-scovery <URL> [options]
+./GolDigger <URL> [options]
 # ou
-./yg-scovery [options] <URL>
+./GolDigger [options] <URL>
 ```
 
 ### Protocoles couverts automatiquement
@@ -62,13 +62,14 @@ Il suffit de passer l'URL directement en argument, peu importe sa position. Le s
 ### Exemple
 
 ```text
-~/CTF/HTB/en_cours $ ~/Projets/yg-scovery/yg-scovery ygp4ph.me
+~/CTF/HTB/en_cours $ GolDigger ygp4ph.me
 
-   __  ______ _      ______________ _   _____  _______  __
-  / / / / __ `/_____/ ___/ ___/ __ \ | / / _ \/ ___/ / / /
- / /_/ / /_/ /_____(__  ) /__/ /_/ / |/ /  __/ /  / /_/ / 
- \__, /\__, /     /____/\___/\____/|___/\___/_/   \__, /  
-/____//____/                                     /____/   v2.2.3
+   ______      ______  _                      
+  / ____/___  / / __ \(_)___ _____ ____  _____
+ / / __/ __ \/ / / / / / __ `/ __ `/ _ \/ ___/
+/ /_/ / /_/ / / /_/ / / /_/ / /_/ /  __/ /    
+\____/\____/_/_____/_/\__, /\__, /\___/_/     
+                     /____//____/             v2.3.0
  
 [INF] Scanning https://ygp4ph.me (Depth: 3)
 [INT] https://ygp4ph.me/assets/pdp_anime.mp4
