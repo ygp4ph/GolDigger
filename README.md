@@ -1,6 +1,6 @@
 # Yg-Scovery
 
-Un crawler web rapide et efficace écrit en Go pour la découverte automatique de liens et l'exploration de sites web.
+Un crawler web rapide et efficace écrit en Go pour la découverte automatique de liens et l'exploration de sites web, avec support automatique du parsing des `robots.txt` et `sitemap.xml`.
 
 ## Installation
 
@@ -30,38 +30,47 @@ go install
 
 ## Utilisation
 
-### Syntaxe de base
+### Syntaxe de base (façon Nmap)
+
+Il suffit de passer l'URL directement en argument, peu importe sa position. Le scanner ajoutera automatiquement le préfixe `https://` si manquant pour une exécution éclair.
 
 ```bash
-./yg-scovery -u <URL> [options]
+./yg-scovery <URL> [options]
+# ou
+./yg-scovery [options] <URL>
 ```
+
+### Protocoles couverts automatiquement
+
+À chaque lancement, le crawler vérifie immédiatement à la racine de la cible :
+
+- Le `/robots.txt` (extraction de toutes les arborescences listées dans `Allow` et `Disallow` + liens vers sitemaps personnalisés)
+- Le `/sitemap.xml` naturel et extraits
 
 ### Options disponibles
 
 | Flag | Alias       | Description                            | Défaut |
 | ---- | ----------- | -------------------------------------- | ------ |
-| `-u` | `--url`     | URL cible à crawler (requis)           | -      |
 | `-d` | `--depth`   | Profondeur maximale de récursion       | 3      |
-| `-e` | `--ext`     | Afficher uniquement les liens externes | false  |
-| `-i` | `--int`     | Afficher uniquement les liens internes | false  |
+| `-e` | `--ext`     | Inclure également les liens externes   | false  |
 | `-t` | `--tree`    | Afficher l'arbre des liens internes    | false  |
 | `-o` | `--output`  | Sauvegarder les résultats en JSON      | -      |
 | `-v` | `--verbose` | Afficher les erreurs détaillées        | false  |
 | `-h` | `--help`    | Afficher l'aide                        | -      |
+|      | `--version` | Afficher la version de l'outil         | -      |
 
 ### Exemple
 
 ```text
-~/CTF/HTB/en_cours $ ~/Projets/yg-scovery/yg-scovery -u ygp4ph.me -i
+~/CTF/HTB/en_cours $ ~/Projets/yg-scovery/yg-scovery ygp4ph.me
 
    __  ______ _      ______________ _   _____  _______  __
   / / / / __ `/_____/ ___/ ___/ __ \ | / / _ \/ ___/ / / /
  / /_/ / /_/ /_____(__  ) /__/ /_/ / |/ /  __/ /  / /_/ / 
  \__, /\__, /     /____/\___/\____/|___/\___/_/   \__, /  
-/____//____/                                     /____/   v2.1.0
+/____//____/                                     /____/   v2.2.3
  
 [INF] Scanning https://ygp4ph.me (Depth: 3)
-[INF] Filter: Internal links only
 [INT] https://ygp4ph.me/assets/pdp_anime.mp4
 [INT] https://ygp4ph.me/assets/pdp.png
 [INT] https://ygp4ph.me/
