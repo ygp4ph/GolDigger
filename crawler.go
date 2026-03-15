@@ -37,6 +37,11 @@ type Crawler struct {
 	resMu sync.Mutex
 	wg    sync.WaitGroup
 	sem   chan struct{}
+	baseH string
+}
+
+func isSubdomain(sub, base string) bool {
+	return sub != base && (strings.HasSuffix(sub, "."+base) || (strings.HasPrefix(base, "www.") && strings.HasSuffix(sub, "."+base[4:])))
 }
 
 // New creates and initializes a new Crawler instance with the specified configuration.
@@ -53,6 +58,13 @@ func New(cfg Config) *Crawler {
 			},
 		},
 		sem: make(chan struct{}, max(16, runtime.NumCPU()*4)),
+		baseH: func() string {
+			u, _ := url.Parse(cfg.TargetURL)
+			if u != nil {
+				return u.Host
+			}
+			return ""
+		}(),
 	}
 }
 
@@ -191,7 +203,8 @@ func (c *Crawler) enqueue(links []string, base *url.URL, nextDepth int) {
 				return
 			}
 			abs, ext := u.String(), u.Host != base.Host
-			if ext && !c.cfg.IncludeExternal {
+			isSub := isSubdomain(u.Host, c.baseH)
+			if ext && !c.cfg.IncludeExternal && !isSub {
 				return
 			}
 
@@ -224,9 +237,18 @@ func (c *Crawler) enqueue(links []string, base *url.URL, nextDepth int) {
 
 	for _, v := range valid {
 		if _, loaded := c.vis.LoadOrStore(v.u, true); !loaded {
-			prefix, col := "INT", color.GreenString
-			if v.ext {
+			uParsed, _ := url.Parse(v.u)
+			isSub := isSubdomain(uParsed.Host, c.baseH)
+
+			var prefix string
+			var col func(format string, a ...interface{}) string
+
+			if v.ext && !isSub {
 				prefix, col = "EXT", color.CyanString
+			} else if isSub {
+				prefix, col = "SUB", color.YellowString
+			} else {
+				prefix, col = "INT", color.GreenString
 			}
 
 			fmt.Printf("[%s] %s\n", col(prefix), v.u)
@@ -234,7 +256,7 @@ func (c *Crawler) enqueue(links []string, base *url.URL, nextDepth int) {
 			c.res = append(c.res, v.u)
 			c.resMu.Unlock()
 
-			if !v.ext {
+			if !v.ext || isSub {
 				c.wg.Add(1)
 				go func(u string) {
 					defer c.wg.Done()
@@ -248,13 +270,23 @@ func (c *Crawler) enqueue(links []string, base *url.URL, nextDepth int) {
 type treeNode map[string]treeNode
 
 // buildTree constructs a hierarchical tree representation of all validated URLs.
-func (c *Crawler) buildTree() treeNode {
-	root, base := treeNode{}, c.cfg.TargetURL
-	uBase, _ := url.Parse(base)
-	for _, raw := range append([]string{base}, c.res...) {
+func (c *Crawler) buildTree() map[string]treeNode {
+	trees := make(map[string]treeNode)
+
+	for _, raw := range append([]string{c.cfg.TargetURL}, c.res...) {
 		u, _ := url.Parse(raw)
-		if u == nil || u.Host != uBase.Host {
+		if u == nil {
 			continue
+		}
+
+		isSub := isSubdomain(u.Host, c.baseH)
+		if u.Host != c.baseH && !isSub {
+			continue
+		}
+
+		// Obtenir ou créer l'arbre pour ce domaine
+		if _, exists := trees[u.Host]; !exists {
+			trees[u.Host] = treeNode{}
 		}
 
 		path := u.Path
@@ -262,7 +294,7 @@ func (c *Crawler) buildTree() treeNode {
 			path = "/"
 		}
 		parts := strings.Split(path, "/")
-		curr := root
+		curr := trees[u.Host]
 		for i, p := range parts {
 			if p == "" {
 				continue
@@ -275,13 +307,14 @@ func (c *Crawler) buildTree() treeNode {
 			}
 			curr = curr[p]
 		}
+
 		if path == "/" && u.RawQuery != "" {
-			if _, ok := root["?"+u.RawQuery]; !ok {
-				root["?"+u.RawQuery] = treeNode{}
+			if _, ok := trees[u.Host]["?"+u.RawQuery]; !ok {
+				trees[u.Host]["?"+u.RawQuery] = treeNode{}
 			}
 		}
 	}
-	return root
+	return trees
 }
 
 // PrintTree outputs the URL hierarchy to the standard output in a tree structure.
@@ -289,7 +322,18 @@ func (c *Crawler) PrintTree() {
 	if !c.cfg.ShowTree {
 		return
 	}
-	fmt.Printf("\n%s\n%s\n", color.MagentaString("=== Site Tree ==="), c.cfg.TargetURL)
+
+	trees := c.buildTree()
+
+	// Trier les domaines pour un affichage cohérent
+	domains := make([]string, 0, len(trees))
+	for domain := range trees {
+		domains = append(domains, domain)
+	}
+	sort.Strings(domains)
+
+	fmt.Printf("\n%s\n", color.MagentaString("=== Site Trees ==="))
+
 	var printNode func(treeNode, string)
 	printNode = func(n treeNode, pfx string) {
 		keys := make([]string, 0, len(n))
@@ -306,14 +350,28 @@ func (c *Crawler) PrintTree() {
 			printNode(n[k], npfx)
 		}
 	}
-	printNode(c.buildTree(), "")
+
+	for i, domain := range domains {
+		if i > 0 {
+			fmt.Println()
+		}
+
+		// Déterminer le type de domaine
+		if domain == c.baseH {
+			fmt.Printf("%s %s\n", color.GreenString("[MAIN]"), domain)
+		} else {
+			fmt.Printf("%s %s\n", color.YellowString("[SUB]"), domain)
+		}
+
+		printNode(trees[domain], "")
+	}
 }
 
 // SaveJSON exports the crawling results, including the URL tree if enabled, into a JSON file format.
 func (c *Crawler) SaveJSON() error {
-	var t treeNode
+	var trees map[string]treeNode
 	if c.cfg.ShowTree {
-		t = c.buildTree()
+		trees = c.buildTree()
 	}
 	f, err := os.Create(c.cfg.OutputPath)
 	if err != nil {
@@ -322,5 +380,10 @@ func (c *Crawler) SaveJSON() error {
 	defer f.Close()
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
-	return enc.Encode(map[string]any{"target": c.cfg.TargetURL, "results": c.res, "tree": t, "count": len(c.res)})
+	return enc.Encode(map[string]any{
+		"target":  c.cfg.TargetURL,
+		"results": c.res,
+		"trees":   trees,
+		"count":   len(c.res),
+	})
 }

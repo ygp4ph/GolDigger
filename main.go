@@ -11,7 +11,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const Version = "v2.3.1"
+const Version = "v2.4.0"
 
 // main is the entry point of the GolDigger application, parsing CLI flags and starting the crawler.
 func main() {
