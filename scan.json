@@ -1,0 +1,26 @@
+{
+  "domains": {
+    "blog.localhost:5000": {
+      "links": [
+        "http://blog.localhost:5000/",
+        "http://blog.localhost:5000/post-1",
+        "http://blog.localhost:5000/post-1/comments"
+      ]
+    },
+    "dev.localhost:5000": {
+      "links": [
+        "http://dev.localhost:5000/api"
+      ]
+    },
+    "localhost:5000": {
+      "links": [
+        "http://localhost:5000/about"
+      ]
+    }
+  },
+  "stats": {
+    "domains": 3,
+    "total_found": 5
+  },
+  "target": "http://localhost:5000/"
+}

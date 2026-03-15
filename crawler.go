@@ -367,12 +367,38 @@ func (c *Crawler) PrintTree() {
 	}
 }
 
-// SaveJSON exports the crawling results, including the URL tree if enabled, into a JSON file format.
+// SaveJSON exports the crawling results, grouped by domain, into a JSON file format.
 func (c *Crawler) SaveJSON() error {
-	var trees map[string]treeNode
-	if c.cfg.ShowTree {
-		trees = c.buildTree()
+	trees := c.buildTree()
+	
+	// Group flat results by domain
+	resultsByDomain := make(map[string][]string)
+	for _, r := range c.res {
+		u, _ := url.Parse(r)
+		if u != nil {
+			resultsByDomain[u.Host] = append(resultsByDomain[u.Host], r)
+		}
 	}
+
+	output := map[string]any{
+		"target": c.cfg.TargetURL,
+		"stats": map[string]int{
+			"total_found": len(c.res),
+			"domains":     len(trees),
+		},
+		"domains": make(map[string]any),
+	}
+
+	for domain, tree := range trees {
+		domainData := map[string]any{
+			"links": resultsByDomain[domain],
+		}
+		if c.cfg.ShowTree {
+			domainData["tree"] = tree
+		}
+		output["domains"].(map[string]any)[domain] = domainData
+	}
+
 	f, err := os.Create(c.cfg.OutputPath)
 	if err != nil {
 		return err
@@ -380,10 +406,5 @@ func (c *Crawler) SaveJSON() error {
 	defer f.Close()
 	enc := json.NewEncoder(f)
 	enc.SetIndent("", "  ")
-	return enc.Encode(map[string]any{
-		"target":  c.cfg.TargetURL,
-		"results": c.res,
-		"trees":   trees,
-		"count":   len(c.res),
-	})
+	return enc.Encode(output)
 }
